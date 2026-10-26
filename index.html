@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#142724">
+<title>CHIMERA WILD — メンテナンス</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 50% 0%,#37534a,transparent 65%),#101e1c;color:#eee9d7;font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif}main{width:min(100%,560px);padding:clamp(24px,6vw,48px);border:1px solid #65745b;border-radius:22px;background:#192c28;box-shadow:0 24px 90px #0005}small{display:block;color:#d6bc7d;letter-spacing:.22em;font-size:11px}.brand{font-size:30px;letter-spacing:.04em;margin:10px 0 32px;color:#f1d594}h1{font-size:clamp(23px,5vw,30px);line-height:1.5;margin:16px 0}p{font-size:15px;line-height:1.9;color:#cdd5c7}.notice{padding:15px 18px;background:#101e1c;border-left:3px solid #c7a76b;border-radius:5px;margin:24px 0}button{width:100%;min-height:54px;border:1px solid #f0d398;border-radius:10px;background:#dfbc78;color:#202d25;font-size:18px;font-weight:700;cursor:pointer}button:hover{background:#efd39b}button:focus-visible{outline:3px solid white;outline-offset:4px}button:disabled{opacity:.6;cursor:wait}[hidden]{display:none!important}.fine{font-size:12px;color:#a7b5a5}#error{color:#ffbcab}#maintenance{text-align:center;padding:10px 0 18px}.symbol{font-size:48px;color:#d8bd7c;margin:8px auto 22px}footer{border-top:1px solid #40534a;margin-top:30px;padding-top:18px;color:#9aa997;font-size:11px;letter-spacing:.12em}
+</style>
+</head>
+<body><main><small>EVOLUTION / A NEW BEGINNING</small><div class="brand">CHIMERA WILD</div>
+<section id="reset"><h1>保存データのリセット</h1><p>新しいスタートに向けて、ゲームの保存データをリセットします。</p><div class="notice"><p>化石のかけら・仲間・コード・背景・演出・図鑑・冒険の進行状況・設定を削除します。<br><strong>削除したデータは元に戻せません。</strong></p></div><p class="fine">ほかのタブでこのゲームを開いている場合は、先に閉じてください。削除するのは、このサイトで使っている端末・ブラウザ内のCHIMERA WILDのデータです。</p><button id="erase" type="button">消します</button><p id="error" role="alert" hidden></p></section>
+<section id="maintenance" hidden aria-live="polite"><div class="symbol" aria-hidden="true">✦</div><h1 id="maintenance-title" tabindex="-1">今メンテナンス中です。<br>少々お待ちください。</h1><p>保存データのリセットが完了しました。<br>次の冒険の準備をしています。</p></section>
+<noscript><p>データを削除するには、ブラウザのJavaScriptを有効にしてください。</p></noscript>
+<footer>CHIMERA WILD · MAINTENANCE</footer></main>
+<script>
+'use strict';
+// Explicit keys only: other games on this GitHub Pages origin are untouched.
+const GAME_KEYS=['chimera-meta','chimera-run','chimera-input-mode','chimera-progression-v1'];
+const RESET_MARKER='chimera-maintenance-reset-20261026';
+const reset=document.getElementById('reset'),maintenance=document.getElementById('maintenance'),erase=document.getElementById('erase'),error=document.getElementById('error');
+function showMaintenance(focus=false){reset.hidden=true;maintenance.hidden=false;if(focus)document.getElementById('maintenance-title').focus()}
+try{if(localStorage.getItem(RESET_MARKER)==='done'&&GAME_KEYS.every(key=>localStorage.getItem(key)===null))showMaintenance()}catch{/* Keep the explicit reset button visible if storage is unavailable. */}
+erase.addEventListener('click',()=>{
+ erase.disabled=true;error.hidden=true;
+ try{
+  for(const key of GAME_KEYS)localStorage.removeItem(key);
+  if(GAME_KEYS.some(key=>localStorage.getItem(key)!==null))throw new Error('incomplete');
+ }catch{
+  error.textContent='削除を完了できませんでした。ブラウザの保存設定を確認して、もう一度「消します」を押してください。';error.hidden=false;erase.disabled=false;return;
+ }
+ // A full storage quota may prevent this marker, but must not misreport a successful deletion.
+ try{localStorage.setItem(RESET_MARKER,'done')}catch{}
+ showMaintenance(true);
+});
+</script></body></html>
